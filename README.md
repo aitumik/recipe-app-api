@@ -25,7 +25,7 @@ docker build .
 docker-compose up
 ```
 
-If you followed the above steps carefully your api should be served on [https://localhost:8000/api](localhost)
+If you followed the above steps carefully your api should be served on [localhost](http://localhost:8000/api)
 
 ## Contributing
 I accept pull requests so you can fork and create a pull request I will try my best to review and merge your feature or bug-fix
