@@ -9,3 +9,69 @@ from core.models import Ingredient
 from recipe.serializers import IngredientSerializer
 
 
+INGREDIENTS_URL = reverse("recipe:ingredient-list")
+
+
+class PublicIngredientsAPITests(TestCase):
+    """Test the the publicly available ingredients api"""
+
+    def setUp(self):
+        self.client = APIClient()
+
+    def test_login_required(self):
+        """
+        Test the login is required to acces the endpoint
+        """
+        res = self.client.get(INGREDIENTS_URL)
+
+        self.assertEqual(res.status_code,status.HTTP_401_UNAUTHORIZED)
+
+
+class PrivateIngredientsAPITests(TestCase):
+    """
+    Test ingredients can be retrieved by authorized user
+    """
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = get_user_model().objects.create(
+            "test@deveint.com",
+            "password"
+        )
+        self.client.force_authenticate(self.user)
+
+    def test_retrieve_ingredients_list(self):
+        """
+        Docstring
+        """
+
+        Ingredient.objects.create(user=self.user, name="2 Piecer")
+        Ingredient.objects.create(user=self.user, name="Deployable burger")
+
+        res = self.client.get(INGREDIENTS_URL)
+
+        ingredients = Ingredient.objects.all().order_by("-name")
+        serializer = IngredientSerializer(ingredients, many=True)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data,serializer.data)
+
+
+    def test_ingredients_limited_to_user(self):
+        """
+        Test that ingredients are limited
+        """
+
+        user2 = get_user_model().objects.create_user(
+            "other@deveint.com",
+            "testing"
+        )
+
+        Ingredient.objects.create(user=user2, name="Vinegar")
+        ingredient = Ingredient.object.create(user=user2, name="Tumeric")
+
+        res = self.client.get(INGREDIENTS_URL)
+
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data),1)
+        self.assertEqual(res.data[0]['name'], ingredient.name)
