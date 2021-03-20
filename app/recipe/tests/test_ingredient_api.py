@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.test import APIClient
 
 from core.models import Ingredient
+#from recipe.serializers import IngredientSerializer
 from recipe.serializers import IngredientSerializer
 
 
@@ -35,8 +36,8 @@ class PrivateIngredientsAPITests(TestCase):
     def setUp(self):
         self.client = APIClient()
         self.user = get_user_model().objects.create(
-            "test@deveint.com",
-            "password"
+            email="test@deveint.com",
+            password="password"
         )
         self.client.force_authenticate(self.user)
 
@@ -68,7 +69,7 @@ class PrivateIngredientsAPITests(TestCase):
         )
 
         Ingredient.objects.create(user=user2, name="Vinegar")
-        ingredient = Ingredient.object.create(user=user2, name="Tumeric")
+        ingredient = Ingredient.objects.create(user=user2, name="Tumeric")
 
         res = self.client.get(INGREDIENTS_URL)
 
