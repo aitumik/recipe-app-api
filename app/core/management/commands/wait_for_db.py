@@ -4,7 +4,7 @@ from django.db import connections
 from django.db.utils import OperationalError
 from django.core.management.base import BaseCommand
 
-
+#learn what this does and finish working on the project idiot
 class Command(BaseCommand):
     """Django command to pause execution until database is available"""
 
