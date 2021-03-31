@@ -62,7 +62,9 @@ class PrivateIngredientsAPITests(TestCase):
         Test that ingredients are limited
         """
 
-        user2 = get_user_model().objects.create_user("other@deveint.com", "testing")
+        user2 = get_user_model().objects.create_user(
+            "other@deveint.com", "testing"
+        )
 
         Ingredient.objects.create(user=user2, name="Vinegar")
         ingredient = Ingredient.objects.create(user=self.user, name="Tumeric")

@@ -28,7 +28,9 @@ class PublicTagsApiTest(TestCase):
 
 class PrivateTagsApiTests(TestCase):
     def setUp(self):
-        self.user = get_user_model().objects.create_user("test@deveint.com", "testing")
+        self.user = get_user_model().objects.create_user(
+            "test@deveint.com", "testing"
+        )
         self.client = APIClient()
         self.client.force_authenticate(self.user)
 
@@ -45,7 +47,9 @@ class PrivateTagsApiTests(TestCase):
         self.assertEqual(res.data, serializer.data)
 
     def test_tags_are_for_user(self):
-        user2 = get_user_model().objects.create_user("london@deveint.com", "testing")
+        user2 = get_user_model().objects.create_user(
+            "london@deveint.com", "testing"
+        )
         Tag.objects.create(user=user2, name="Fruity")
         tag = Tag.objects.create(user=self.user, name="Comfort food")
 
@@ -60,7 +64,9 @@ class PrivateTagsApiTests(TestCase):
         payload = {"name": "Test tag"}
         self.client.post(TAGS_URL, payload)
 
-        exists = Tag.objects.filter(user=self.user, name=payload["name"]).exists()
+        exists = Tag.objects.filter(
+            user=self.user, name=payload["name"]
+        ).exists()
 
         self.assertTrue(exists)
 
