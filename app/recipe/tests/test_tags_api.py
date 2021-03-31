@@ -10,7 +10,7 @@ from core.models import Tag
 from recipe.serializers import TagSerializer
 
 
-TAGS_URL = reverse('recipe:tag-list')
+TAGS_URL = reverse("recipe:tag-list")
 
 
 class PublicTagsApiTest(TestCase):
@@ -23,62 +23,50 @@ class PublicTagsApiTest(TestCase):
         """Test login is required for retrieving tags"""
         res = self.client.get(TAGS_URL)
 
-        self.assertEqual(res.status_code,status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class PrivateTagsApiTests(TestCase):
-
     def setUp(self):
-        self.user = get_user_model().objects.create_user(
-            'test@deveint.com',
-            'testing'
-        )
+        self.user = get_user_model().objects.create_user("test@deveint.com", "testing")
         self.client = APIClient()
         self.client.force_authenticate(self.user)
 
     def test_retrieve_tags(self):
-        Tag.objects.create(user=self.user,name='Vegan')
-        Tag.objects.create(user=self.user,name='Desert')
+        Tag.objects.create(user=self.user, name="Vegan")
+        Tag.objects.create(user=self.user, name="Desert")
 
         res = self.client.get(TAGS_URL)
 
-        tags = Tag.objects.all().order_by('-name')
-        serializer = TagSerializer(tags,many=True)
+        tags = Tag.objects.all().order_by("-name")
+        serializer = TagSerializer(tags, many=True)
 
-        self.assertEqual(res.status_code,status.HTTP_200_OK)
-        self.assertEqual(res.data,serializer.data)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.data, serializer.data)
 
     def test_tags_are_for_user(self):
-        user2 = get_user_model().objects.create_user(
-            'london@deveint.com',
-            'testing'
-        )
-        Tag.objects.create(user=user2, name='Fruity')
-        tag = Tag.objects.create(user=self.user, name='Comfort food')
-        
+        user2 = get_user_model().objects.create_user("london@deveint.com", "testing")
+        Tag.objects.create(user=user2, name="Fruity")
+        tag = Tag.objects.create(user=self.user, name="Comfort food")
+
         res = self.client.get(TAGS_URL)
 
-        self.assertEqual(res.status_code,status.HTTP_200_OK)
-        self.assertEqual(len(res.data),1)
-        self.assertEqual(res.data[0]['name'],tag.name)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        self.assertEqual(res.data[0]["name"], tag.name)
 
     def test_create_tag_successful(self):
         """Test creating a new tag"""
-        payload = {'name': 'Test tag'}
+        payload = {"name": "Test tag"}
         self.client.post(TAGS_URL, payload)
 
-        exists = Tag.objects.filter(
-            user=self.user,
-            name=payload['name']
-        ).exists()
+        exists = Tag.objects.filter(user=self.user, name=payload["name"]).exists()
 
         self.assertTrue(exists)
 
     def test_create_tag_invalid(self):
         """TEst creating a new tag with invalid payload"""
-        payload = {'name': ''}
+        payload = {"name": ""}
         res = self.client.post(TAGS_URL, payload)
-        
-        self.assertEqual(res.status_code,status.HTTP_400_BAD_REQUEST)
 
- 
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
