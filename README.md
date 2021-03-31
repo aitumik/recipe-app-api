@@ -2,7 +2,7 @@
 This is an api for managing recipes,it also includes authentication and stuff
 
 ## About me
-I am a computer programmer
+I am a software developer and breaker
 
 ## Setup
 Make sure you have installed docker-compose and docker in you local machine
